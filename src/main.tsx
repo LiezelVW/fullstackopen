@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
     <nav aria-label="Exercises">
       <a href="?app=courseinfo">Course Information (1.1–1.5)</a>
       {' | '}
-      <a href="?app=unicafe">Unicafe (1.6–1.10)</a>
+      <a href="?app=unicafe">Unicafe (1.6–1.11)</a>
     </nav>
     <App />
   </StrictMode>,
