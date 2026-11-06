@@ -25,7 +25,7 @@ createRoot(document.getElementById('root')!).render(
       {' | '}
       <a href="?app=anecdotes">Anecdotes (1.12–1.14)</a>
       {' | '}
-      <a href="?app=courseinfo2">Course Information (2.1–2.3)</a>
+      <a href="?app=courseinfo2">Course Information (2.1–2.4)</a>
     </nav>
     <App />
   </StrictMode>,
