@@ -29,13 +29,21 @@ const App = () => {
     setSelected(randomIndex)
   }
 
+  // Find the highest count, then the first quote with that count.
+  const mostVotes = Math.max(...votes)
+  const mostVoted = votes.indexOf(mostVotes)
+
   return (
     <div>
-      <h1>Anecdotes</h1>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <button onClick={handleVote}>vote</button>{' '}
       <button onClick={handleNext}>next anecdote</button>
+
+      <h2>Anecdote with most votes</h2>
+      <p>{anecdotes[mostVoted]}</p>
+      <p>has {mostVotes} votes</p>
     </div>
   )
 }
