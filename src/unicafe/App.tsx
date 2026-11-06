@@ -9,8 +9,18 @@ type StatisticsProps = {
 // Exercise 1.8: receive the counters as props and display the statistics.
 const Statistics = ({ good, neutral, bad }: StatisticsProps) => {
   const total = good + neutral + bad
-  const average = total === 0 ? 0 : (good - bad) / total
-  const positive = total === 0 ? 0 : (good / total) * 100
+  // Exercise 1.9: show a message until the first feedback is recorded.
+  if (total === 0) {
+    return (
+      <div>
+        <h2>statistics</h2>
+        <p>No feedback given</p>
+      </div>
+    )
+  }
+
+  const average = (good - bad) / total
+  const positive = (good / total) * 100
 
   return (
     <div>
