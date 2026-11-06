@@ -14,6 +14,14 @@ const anecdotes = [
 
 const App = () => {
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState<number[]>(Array(anecdotes.length).fill(0))
+
+  const handleVote = () => {
+    // Copy the array before updating the selected quote's count.
+    const nextVotes = [...votes]
+    nextVotes[selected] += 1
+    setVotes(nextVotes)
+  }
 
   const handleNext = () => {
     // Pick an array position from 0 up to the last index.
@@ -25,6 +33,8 @@ const App = () => {
     <div>
       <h1>Anecdotes</h1>
       <p>{anecdotes[selected]}</p>
+      <p>has {votes[selected]} votes</p>
+      <button onClick={handleVote}>vote</button>{' '}
       <button onClick={handleNext}>next anecdote</button>
     </div>
   )
