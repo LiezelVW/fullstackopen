@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
       {' | '}
       <a href="?app=unicafe">Unicafe (1.6–1.11)</a>
       {' | '}
-      <a href="?app=anecdotes">Anecdotes (1.12–1.13)</a>
+      <a href="?app=anecdotes">Anecdotes (1.12–1.14)</a>
     </nav>
     <App />
   </StrictMode>,
