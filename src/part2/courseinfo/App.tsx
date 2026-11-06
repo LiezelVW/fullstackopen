@@ -22,10 +22,16 @@ const Content = ({ parts }: { parts: CoursePart[] }) => (
   </div>
 )
 
+const Total = ({ parts }: { parts: CoursePart[] }) => {
+  const total = parts.reduce((sum, part) => sum + part.exercises, 0)
+  return <p><strong>total of {total} exercises</strong></p>
+}
+
 const Course = ({ course }: { course: CourseData }) => (
   <div>
     <Header name={course.name} />
     <Content parts={course.parts} />
+    <Total parts={course.parts} />
   </div>
 )
 
