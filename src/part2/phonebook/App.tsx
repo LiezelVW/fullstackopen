@@ -14,14 +14,16 @@ const Filter = ({ value, onChange }: {
   </div>
 )
 
-const PersonForm = ({ name, number, onNameChange, onNumberChange, onSubmit }: {
+const PersonForm = ({ name, number, onNameChange, onNumberChange, onSubmit, saving }: {
   name: string
   number: string
   onNameChange: (value: string) => void
   onNumberChange: (value: string) => void
+  saving: boolean
   onSubmit: (event: FormEvent<HTMLFormElement>) => void
 }) => (
   <form onSubmit={onSubmit}>
+    <fieldset disabled={saving}>
     <div>
       <label htmlFor="person-name">name: </label>
       <input id="person-name" value={name} onChange={event => onNameChange(event.target.value)} required />
@@ -30,7 +32,8 @@ const PersonForm = ({ name, number, onNameChange, onNumberChange, onSubmit }: {
       <label htmlFor="person-number">number: </label>
       <input id="person-number" type="tel" value={number} onChange={event => onNumberChange(event.target.value)} required />
     </div>
-    <button type="submit">add</button>
+    <button type="submit">{saving ? 'Saving…' : 'add'}</button>
+    </fieldset>
   </form>
 )
 
@@ -45,6 +48,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
@@ -66,17 +71,26 @@ const App = () => {
 
   const addPerson = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!newName.trim() || !newNumber.trim()) return
+    if (saving || !newName.trim() || !newNumber.trim()) return
 
     if (persons.some(person => person.name === newName.trim())) {
       window.alert(`${newName.trim()} is already added to phonebook`)
       return
     }
 
-    const person = { id: crypto.randomUUID(), name: newName.trim(), number: newNumber.trim() }
-    setPersons(persons.concat(person))
-    setNewName('')
-    setNewNumber('')
+    const person = { name: newName.trim(), number: newNumber.trim() }
+    setSaving(true)
+    setSaveError('')
+    axios.post<Person>('http://localhost:3001/persons', person)
+      .then(response => {
+        setPersons(currentPersons => currentPersons.concat(response.data))
+        setNewName('')
+        setNewNumber('')
+      })
+      .catch(() => {
+        setSaveError('Could not save the contact. Check the server and try again.')
+      })
+      .finally(() => setSaving(false))
   }
 
   return (
@@ -85,7 +99,9 @@ const App = () => {
       {loadError && <p role="alert">{loadError}</p>}
       <Filter value={filter} onChange={setFilter} />
       <h2>Add a new person</h2>
+      {saveError && <p role="alert">{saveError}</p>}
       <PersonForm
+        saving={saving}
         name={newName}
         number={newNumber}
         onNameChange={setNewName}
