@@ -2,21 +2,23 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 
 const App = () => {
-  const [persons, setPersons] = useState([{ id: 1, name: 'Arto Hellas' }])
+  const [persons, setPersons] = useState([{ id: 1, name: 'Arto Hellas', number: '040-123456' }])
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
   const addPerson = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!newName.trim()) return
+    if (!newName.trim() || !newNumber.trim()) return
 
     if (persons.some(person => person.name === newName.trim())) {
       window.alert(`${newName.trim()} is already added to phonebook`)
       return
     }
 
-    const person = { id: persons.length + 1, name: newName.trim() }
+    const person = { id: persons.length + 1, name: newName.trim(), number: newNumber.trim() }
     setPersons(persons.concat(person))
     setNewName('')
+    setNewNumber('')
   }
 
   return (
@@ -32,10 +34,20 @@ const App = () => {
             required
           />
         </div>
+        <div>
+          <label htmlFor="person-number">number: </label>
+          <input
+            id="person-number"
+            type="tel"
+            value={newNumber}
+            onChange={event => setNewNumber(event.target.value)}
+            required
+          />
+        </div>
         <button type="submit">add</button>
       </form>
       <h2>Numbers</h2>
-      {persons.map(person => <p key={person.id}>{person.name}</p>)}
+      {persons.map(person => <p key={person.id}>{person.name} {person.number}</p>)}
     </div>
   )
 }
