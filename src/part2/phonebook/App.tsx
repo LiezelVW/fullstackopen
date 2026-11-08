@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import axios from 'axios'
 
-type Person = { id: number; name: string; number: string }
+type Person = { id: string; name: string; number: string }
 
 const Filter = ({ value, onChange }: {
   value: string
@@ -40,9 +41,23 @@ const Persons = ({ persons }: { persons: Person[] }) => (
 )
 
 const App = () => {
-  const [persons, setPersons] = useState<Person[]>([{ id: 1, name: 'Arto Hellas', number: '040-123456' }])
+  const [persons, setPersons] = useState<Person[]>([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+
+  const [loadError, setLoadError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    axios.get<Person[]>('http://localhost:3001/persons')
+      .then(response => {
+        if (active) setPersons(response.data)
+      })
+      .catch(() => {
+        if (active) setLoadError('Could not load contacts. Check that npm run server is running.')
+      })
+    return () => { active = false }
+  }, [])
 
   const [filter, setFilter] = useState('')
   const visiblePersons = persons.filter(person =>
@@ -58,7 +73,7 @@ const App = () => {
       return
     }
 
-    const person = { id: persons.length + 1, name: newName.trim(), number: newNumber.trim() }
+    const person = { id: crypto.randomUUID(), name: newName.trim(), number: newNumber.trim() }
     setPersons(persons.concat(person))
     setNewName('')
     setNewNumber('')
@@ -67,6 +82,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      {loadError && <p role="alert">{loadError}</p>}
       <Filter value={filter} onChange={setFilter} />
       <h2>Add a new person</h2>
       <PersonForm
