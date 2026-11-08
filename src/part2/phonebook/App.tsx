@@ -103,17 +103,22 @@ const App = () => {
     event.preventDefault()
     if (saving || !newName.trim() || !newNumber.trim()) return
 
-    if (persons.some(person => person.name === newName.trim())) {
-      window.alert(`${newName.trim()} is already added to phonebook`)
-      return
-    }
+    const existingPerson = persons.find(person => person.name === newName.trim())
+    if (existingPerson && !window.confirm(
+      `${existingPerson.name} is already added to phonebook. Replace the old number with a new one?`
+    )) return
 
     const person = { name: newName.trim(), number: newNumber.trim() }
     setSaving(true)
     setSaveError('')
-    personService.create(person)
-      .then(savedPerson => {
-        setPersons(currentPersons => currentPersons.concat(savedPerson))
+    const request = existingPerson
+      ? personService.update(existingPerson.id, person)
+      : personService.create(person)
+
+    request.then(savedPerson => {
+        setPersons(currentPersons => existingPerson
+          ? currentPersons.map(p => p.id === savedPerson.id ? savedPerson : p)
+          : currentPersons.concat(savedPerson))
         setNewName('')
         setNewNumber('')
       })
