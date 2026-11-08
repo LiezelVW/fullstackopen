@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
+import { isAxiosError } from 'axios'
 import personService from './services/persons'
 import type { Person } from './services/persons'
 
-const Notification = ({ message }: { message: string | undefined }) => {
+const Notification = ({ message, type = 'success' }: {
+  message: string | undefined
+  type?: 'success' | 'error'
+}) => {
   if (!message) return null
   return (
-    <div role="status" style={{
-      color: '#166534', background: '#f0fdf4', border: '2px solid #166534',
+    <div role={type === 'error' ? 'alert' : 'status'} style={{
+      color: type === 'error' ? '#991b1b' : '#166534',
+      background: type === 'error' ? '#fef2f2' : '#f0fdf4',
+      border: '2px solid currentColor',
       borderRadius: 6, padding: 12, marginBottom: 16, fontSize: 18,
     }}>
       {message}
@@ -73,9 +79,8 @@ const App = () => {
   const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [deleteError, setDeleteError] = useState('')
   const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState('')
   const [loadError, setLoadError] = useState('')
-  const [notification, setNotification] = useState<{ message: string } | null>(null)
+  const [notification, setNotification] = useState<{ message: string; type?: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
     if (!notification) return
@@ -129,7 +134,6 @@ const App = () => {
 
     const person = { name: newName.trim(), number: newNumber.trim() }
     setSaving(true)
-    setSaveError('')
     const request = existingPerson
       ? personService.update(existingPerson.id, person)
       : personService.create(person)
@@ -144,8 +148,16 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
-      .catch(() => {
-        setSaveError('Could not save the contact. Check the server and try again.')
+      .catch(error => {
+        if (existingPerson && isAxiosError(error) && error.response?.status === 404) {
+          setNotification({
+            message: `${existingPerson.name} has already been removed from the server`,
+            type: 'error',
+          })
+          setPersons(currentPersons => currentPersons.filter(p => p.id !== existingPerson.id))
+        } else {
+          setNotification({ message: 'Could not save the contact. Check the server and try again.', type: 'error' })
+        }
       })
       .finally(() => setSaving(false))
   }
@@ -153,11 +165,10 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <Notification message={notification?.message} />
+      <Notification message={notification?.message} type={notification?.type} />
       {loadError && <p role="alert">{loadError}</p>}
       <Filter value={filter} onChange={setFilter} />
       <h2>Add a new person</h2>
-      {saveError && <p role="alert">{saveError}</p>}
       <PersonForm
         saving={saving}
         name={newName}
