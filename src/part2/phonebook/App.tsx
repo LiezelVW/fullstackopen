@@ -3,6 +3,18 @@ import type { FormEvent } from 'react'
 import personService from './services/persons'
 import type { Person } from './services/persons'
 
+const Notification = ({ message }: { message: string | undefined }) => {
+  if (!message) return null
+  return (
+    <div role="status" style={{
+      color: '#166534', background: '#f0fdf4', border: '2px solid #166534',
+      borderRadius: 6, padding: 12, marginBottom: 16, fontSize: 18,
+    }}>
+      {message}
+    </div>
+  )
+}
+
 const Filter = ({ value, onChange }: {
   value: string
   onChange: (value: string) => void
@@ -63,6 +75,13 @@ const App = () => {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [loadError, setLoadError] = useState('')
+  const [notification, setNotification] = useState<{ message: string } | null>(null)
+
+  useEffect(() => {
+    if (!notification) return
+    const timer = window.setTimeout(() => setNotification(null), 5000)
+    return () => window.clearTimeout(timer)
+  }, [notification])
 
   useEffect(() => {
     let active = true
@@ -119,6 +138,9 @@ const App = () => {
         setPersons(currentPersons => existingPerson
           ? currentPersons.map(p => p.id === savedPerson.id ? savedPerson : p)
           : currentPersons.concat(savedPerson))
+        setNotification({ message: existingPerson
+          ? `Updated ${savedPerson.name}'s number`
+          : `Added ${savedPerson.name}` })
         setNewName('')
         setNewNumber('')
       })
@@ -131,6 +153,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+      <Notification message={notification?.message} />
       {loadError && <p role="alert">{loadError}</p>}
       <Filter value={filter} onChange={setFilter} />
       <h2>Add a new person</h2>
