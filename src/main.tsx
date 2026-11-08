@@ -30,7 +30,7 @@ createRoot(document.getElementById('root')!).render(
       {' | '}
       <a href="?app=courseinfo2">Course Information (2.1–2.5)</a>
       {' | '}
-      <a href="?app=phonebook">Phonebook (2.6–2.16)</a>
+      <a href="?app=phonebook">Phonebook (2.6–2.17)</a>
     </nav>
     <App />
   </StrictMode>,
