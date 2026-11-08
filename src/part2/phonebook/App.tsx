@@ -36,9 +36,20 @@ const PersonForm = ({ name, number, onNameChange, onNumberChange, onSubmit, savi
   </form>
 )
 
-const Persons = ({ persons }: { persons: Person[] }) => (
+const Persons = ({ persons, onDelete, deletingIds }: {
+  persons: Person[]
+  onDelete: (person: Person) => void
+  deletingIds: string[]
+}) => (
   <div>
-    {persons.map(person => <p key={person.id}>{person.name} {person.number}</p>)}
+    {persons.map(person => (
+      <p key={person.id}>
+        {person.name} {person.number}{' '}
+        <button type="button" onClick={() => onDelete(person)} disabled={deletingIds.includes(person.id)}>
+          {deletingIds.includes(person.id) ? 'Deleting…' : 'delete'}
+        </button>
+      </p>
+    ))}
   </div>
 )
 
@@ -47,6 +58,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
+  const [deletingIds, setDeletingIds] = useState<string[]>([])
+  const [deleteError, setDeleteError] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [loadError, setLoadError] = useState('')
@@ -67,6 +80,24 @@ const App = () => {
   const visiblePersons = persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   )
+
+  const deletePerson = (person: Person) => {
+    if (deletingIds.includes(person.id)) return
+    if (!window.confirm(`Delete ${person.name}?`)) return
+
+    setDeleteError('')
+    setDeletingIds(currentIds => currentIds.concat(person.id))
+    personService.remove(person.id)
+      .then(() => {
+        setPersons(currentPersons => currentPersons.filter(p => p.id !== person.id))
+      })
+      .catch(() => {
+        setDeleteError(`Could not delete ${person.name}. Check the server and try again.`)
+      })
+      .finally(() => {
+        setDeletingIds(currentIds => currentIds.filter(id => id !== person.id))
+      })
+  }
 
   const addPerson = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -108,7 +139,8 @@ const App = () => {
         onSubmit={addPerson}
       />
       <h2>Numbers</h2>
-      <Persons persons={visiblePersons} />
+      {deleteError && <p role="alert">{deleteError}</p>}
+      <Persons persons={visiblePersons} onDelete={deletePerson} deletingIds={deletingIds} />
     </div>
   )
 }
