@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import axios from 'axios'
-
-type Person = { id: string; name: string; number: string }
+import personService from './services/persons'
+import type { Person } from './services/persons'
 
 const Filter = ({ value, onChange }: {
   value: string
@@ -54,9 +53,9 @@ const App = () => {
 
   useEffect(() => {
     let active = true
-    axios.get<Person[]>('http://localhost:3001/persons')
-      .then(response => {
-        if (active) setPersons(response.data)
+    personService.getAll()
+      .then(initialPersons => {
+        if (active) setPersons(initialPersons)
       })
       .catch(() => {
         if (active) setLoadError('Could not load contacts. Check that npm run server is running.')
@@ -81,9 +80,9 @@ const App = () => {
     const person = { name: newName.trim(), number: newNumber.trim() }
     setSaving(true)
     setSaveError('')
-    axios.post<Person>('http://localhost:3001/persons', person)
-      .then(response => {
-        setPersons(currentPersons => currentPersons.concat(response.data))
+    personService.create(person)
+      .then(savedPerson => {
+        setPersons(currentPersons => currentPersons.concat(savedPerson))
         setNewName('')
         setNewNumber('')
       })
