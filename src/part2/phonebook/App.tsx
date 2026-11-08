@@ -9,6 +9,11 @@ const App = () => {
     event.preventDefault()
     if (!newName.trim()) return
 
+    if (persons.some(person => person.name === newName.trim())) {
+      window.alert(`${newName.trim()} is already added to phonebook`)
+      return
+    }
+
     const person = { id: persons.length + 1, name: newName.trim() }
     setPersons(persons.concat(person))
     setNewName('')
