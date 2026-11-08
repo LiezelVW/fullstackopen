@@ -1,8 +1,46 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 
+type Person = { id: number; name: string; number: string }
+
+const Filter = ({ value, onChange }: {
+  value: string
+  onChange: (value: string) => void
+}) => (
+  <div>
+    <label htmlFor="name-filter">filter shown with: </label>
+    <input id="name-filter" value={value} onChange={event => onChange(event.target.value)} />
+  </div>
+)
+
+const PersonForm = ({ name, number, onNameChange, onNumberChange, onSubmit }: {
+  name: string
+  number: string
+  onNameChange: (value: string) => void
+  onNumberChange: (value: string) => void
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) => (
+  <form onSubmit={onSubmit}>
+    <div>
+      <label htmlFor="person-name">name: </label>
+      <input id="person-name" value={name} onChange={event => onNameChange(event.target.value)} required />
+    </div>
+    <div>
+      <label htmlFor="person-number">number: </label>
+      <input id="person-number" type="tel" value={number} onChange={event => onNumberChange(event.target.value)} required />
+    </div>
+    <button type="submit">add</button>
+  </form>
+)
+
+const Persons = ({ persons }: { persons: Person[] }) => (
+  <div>
+    {persons.map(person => <p key={person.id}>{person.name} {person.number}</p>)}
+  </div>
+)
+
 const App = () => {
-  const [persons, setPersons] = useState([{ id: 1, name: 'Arto Hellas', number: '040-123456' }])
+  const [persons, setPersons] = useState<Person[]>([{ id: 1, name: 'Arto Hellas', number: '040-123456' }])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
@@ -29,39 +67,17 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
-      <div>
-        <label htmlFor="name-filter">filter shown with: </label>
-        <input
-          id="name-filter"
-          value={filter}
-          onChange={event => setFilter(event.target.value)}
-        />
-      </div>
+      <Filter value={filter} onChange={setFilter} />
       <h2>Add a new person</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          <label htmlFor="person-name">name: </label>
-          <input
-            id="person-name"
-            value={newName}
-            onChange={event => setNewName(event.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="person-number">number: </label>
-          <input
-            id="person-number"
-            type="tel"
-            value={newNumber}
-            onChange={event => setNewNumber(event.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">add</button>
-      </form>
+      <PersonForm
+        name={newName}
+        number={newNumber}
+        onNameChange={setNewName}
+        onNumberChange={setNewNumber}
+        onSubmit={addPerson}
+      />
       <h2>Numbers</h2>
-      {visiblePersons.map(person => <p key={person.id}>{person.name} {person.number}</p>)}
+      <Persons persons={visiblePersons} />
     </div>
   )
 }
