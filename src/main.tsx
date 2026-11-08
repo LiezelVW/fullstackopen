@@ -6,10 +6,13 @@ import Unicafe from './unicafe/App.tsx'
 import Anecdotes from './anecdotes/App.tsx'
 import PartTwoCourse from './part2/courseinfo/App.tsx'
 import Phonebook from './part2/phonebook/App.tsx'
+import Countries from './part2/countries/App.tsx'
 
 // Keep all exercise apps available from the navigation.
 const selectedApp = new URLSearchParams(window.location.search).get('app')
-const App = selectedApp === 'phonebook'
+const App = selectedApp === 'countries'
+  ? Countries
+  : selectedApp === 'phonebook'
   ? Phonebook
   : selectedApp === 'courseinfo2'
   ? PartTwoCourse
@@ -31,6 +34,8 @@ createRoot(document.getElementById('root')!).render(
       <a href="?app=courseinfo2">Course Information (2.1–2.5)</a>
       {' | '}
       <a href="?app=phonebook">Phonebook (2.6–2.17)</a>
+      {' | '}
+      <a href="?app=countries">Countries (2.18)</a>
     </nav>
     <App />
   </StrictMode>,
