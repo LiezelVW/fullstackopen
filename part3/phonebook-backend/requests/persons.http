@@ -1,0 +1,26 @@
+### 3.1: all entries
+GET http://localhost:3001/api/persons
+
+### 3.2: count and request time
+GET http://localhost:3001/info
+
+### 3.3: one entry
+GET http://localhost:3001/api/persons/2
+
+### Missing entry: 404
+GET http://localhost:3001/api/persons/not-found
+
+### 3.4: delete an entry (restarting restores initial data)
+DELETE http://localhost:3001/api/persons/1
+
+### 3.5: create an entry; repeat to see duplicate-name error
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{"name":"Test Person","number":"123-456"}
+
+### 3.6: missing number produces 400
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{"name":"Missing Number"}
