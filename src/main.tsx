@@ -35,9 +35,8 @@ createRoot(document.getElementById('root')!).render(
       {' | '}
       <a href="?app=phonebook">Phonebook (2.6–2.17)</a>
       {' | '}
-      <a href="?app=countries">Countries (2.18)</a>
+      <a href="?app=countries">Countries (2.18–2.20)</a>
     </nav>
     <App />
   </StrictMode>,
 )
-
